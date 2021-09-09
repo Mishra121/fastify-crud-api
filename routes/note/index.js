@@ -1,6 +1,9 @@
 'use strict'
+const NotesDAL = require('./notesDAL');
 
 module.exports = async function (fastify, opts) {
+
+    const notesDAL = NotesDAL(fastify.db);
 
     fastify.route({
         method: 'GET',
@@ -54,7 +57,10 @@ module.exports = async function (fastify, opts) {
             }
         },
         handler: async (request, reply) => {
-            return [];
+            const { title, body } = request.body;
+
+            const newNote = await notesDAL.createNote(title, body);
+            return newNote;
         }
     })
 

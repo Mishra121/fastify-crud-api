@@ -27,7 +27,7 @@ module.exports = async function (fastify, opts) {
             }
         },
         handler: async (request, reply) => {
-            return [];
+            return notesDAL.getNotes();
         }
     })
 

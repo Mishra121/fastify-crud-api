@@ -1,4 +1,5 @@
 'use strict'
+const { notesSchema } = require('./schema');
 const NotesDAL = require('./notesDAL');
 
 module.exports = async function (fastify, opts) {
@@ -14,15 +15,7 @@ module.exports = async function (fastify, opts) {
             response: {
                 200: {
                     type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'number', description: 'Unique identifier for note' },
-                            title: { type: 'string' },
-                            body: { type: 'string' }
-                        }
-                        
-                    }
+                    items: notesSchema
                 }
             }
         },
@@ -46,14 +39,7 @@ module.exports = async function (fastify, opts) {
                 }
             },
             response: {
-                200: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'number', description: 'Unique identifier for note' },
-                            title: { type: 'string' },
-                            body: { type: 'string' }
-                        }
-                }
+                200: notesSchema
             }
         },
         handler: async (request, reply) => {
@@ -86,18 +72,16 @@ module.exports = async function (fastify, opts) {
                 }
             },
             response: {
-                200: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'number', description: 'Unique identifier for note' },
-                            title: { type: 'string' },
-                            body: { type: 'string' }
-                        }
-                }
+                200: notesSchema
             }
         },
         handler: async (request, reply) => {
-            return [];
+            const { id } = request.params;
+            const { title, body } = request.body;
+
+            const updatedNote = await notesDAL.updateNotes(id, title, body);
+
+            return updatedNote;
         }
     })
 
@@ -122,7 +106,9 @@ module.exports = async function (fastify, opts) {
             }
         },
         handler: async (request, reply) => {
-            return;
+            await notesDAL.deleteNote(request.params.id);
+
+            reply.status(204);
         }
     })
 }

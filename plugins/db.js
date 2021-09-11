@@ -19,18 +19,18 @@ function runMigrations() {
     })
 }
 
-module.exports = fp(function (fastify, opts, next) {
+module.exports = fp(async function (fastify, opts, next) {
     const db = pgp(appConfig.postgresUri);
 
     fastify.decorate('db', db);
 
-    runMigrations().then(migrationResults => {
-        if(migrationResults.length > 0){
-            fastify.log.info({ migrationCount: migrationResults.length, msg: 'Successful migrations run' })
-        }
+    const migrationResults = await runMigrations();
 
-        console.log('finished migrations')
-    })
+    if(migrationResults.length > 0){
+        fastify.log.info({ migrationCount: migrationResults.length, msg: 'Successful migrations run' })
+    }
+
+    console.log('finished migrations')
 
     next()
 })
